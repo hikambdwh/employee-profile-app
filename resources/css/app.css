@@ -1,0 +1,174 @@
+@import "tailwindcss";
+@import "flowbite/src/themes/default";
+
+@plugin "flowbite/plugin";
+@plugin "flowbite-typography";
+
+@source "../../node_modules/flowbite";
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../**/*.blade.php";
+@source "../**/*.js";
+
+@theme {
+    /* Kanmo-inspired palette; primary orange approximates the public identity. */
+    --color-kanmo-50: #fff7f2;
+    --color-kanmo-100: #ffeadf;
+    --color-kanmo-200: #ffd2bd;
+    --color-kanmo-300: #ffad83;
+    --color-kanmo-400: #fa7b45;
+    --color-kanmo-500: #f15a24;
+    --color-kanmo-600: #dd4314;
+    --color-kanmo-700: #b73512;
+    --color-kanmo-800: #922f16;
+    --color-kanmo-900: #762a17;
+    --color-kanmo-950: #401207;
+
+    --color-brand-softer: var(--color-kanmo-50);
+    --color-brand-soft: var(--color-kanmo-100);
+    --color-brand-medium: var(--color-kanmo-200);
+    --color-brand: var(--color-kanmo-500);
+    --color-brand-strong: var(--color-kanmo-700);
+
+    --color-fg-brand-subtle: var(--color-kanmo-300);
+    --color-fg-brand: var(--color-kanmo-600);
+    --color-fg-brand-strong: var(--color-kanmo-800);
+
+    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+    html { scroll-behavior: smooth; }
+    body { @apply bg-stone-50 text-slate-800 antialiased; }
+    button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+    ::selection { @apply bg-kanmo-200 text-kanmo-950; }
+    :focus-visible {
+        outline: 2px solid color-mix(in srgb, #f15a24 70%, transparent);
+        outline-offset: 2px;
+    }
+}
+
+@layer components {
+    .kanmo-page {
+        @apply min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(241,90,36,0.08),transparent_28%),linear-gradient(to_bottom,#fffdfb,#fafaf9)];
+    }
+
+    .kanmo-card {
+        @apply rounded-2xl border border-stone-200/90 bg-white shadow-[0_12px_35px_rgba(28,25,23,0.055)];
+    }
+
+    .kanmo-card-interactive {
+        @apply transition duration-200 hover:-translate-y-0.5 hover:border-kanmo-200 hover:shadow-[0_18px_45px_rgba(241,90,36,0.10)];
+    }
+
+    .kanmo-btn-primary {
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl
+            bg-kanmo-500 px-5 py-2.5 text-sm font-semibold text-white
+            shadow-[0_8px_20px_rgba(241,90,36,0.22)] transition
+            hover:bg-kanmo-600 hover:shadow-[0_10px_24px_rgba(241,90,36,0.28)]
+            focus:outline-none focus:ring-4 focus:ring-kanmo-200/70
+            disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none cursor-pointer;
+    }
+
+    .kanmo-btn-secondary {
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl
+            border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold
+            text-slate-700 transition hover:border-kanmo-200 hover:bg-kanmo-50
+            hover:text-kanmo-700 focus:outline-none focus:ring-4
+            focus:ring-kanmo-100 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer ;
+    }
+
+    .kanmo-btn-ghost {
+        @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl
+            px-4 py-2 text-sm font-semibold text-slate-600 transition
+            hover:bg-stone-100 hover:text-slate-900;
+    }
+
+    .kanmo-label { @apply mb-2 block text-sm font-semibold text-slate-700; }
+    .kanmo-required { @apply ml-0.5 text-kanmo-600; }
+
+    .kanmo-input,
+    .kanmo-select,
+    .kanmo-textarea {
+        @apply block w-full rounded-xl border border-stone-300 bg-white
+            px-3.5 py-3 text-sm text-slate-900 shadow-sm outline-none
+            transition placeholder:text-slate-400 hover:border-stone-400
+            focus:border-kanmo-500 focus:ring-4 focus:ring-kanmo-100;
+    }
+
+    .kanmo-input:disabled,
+    .kanmo-input[readonly],
+    .kanmo-select:disabled,
+    .kanmo-textarea:disabled,
+    .kanmo-textarea[readonly] {
+        @apply cursor-not-allowed border-stone-200 bg-stone-100
+            text-slate-500 shadow-none;
+    }
+
+    .kanmo-input-error {
+        @apply border-rose-400 bg-rose-50/40 focus:border-rose-500 focus:ring-rose-100;
+    }
+
+    .kanmo-help { @apply mt-1.5 text-xs leading-5 text-slate-500; }
+    .kanmo-error { @apply mt-1.5 flex items-start gap-1.5 text-xs font-medium text-rose-600; }
+
+    .kanmo-form-section {
+        @apply overflow-hidden rounded-2xl border border-stone-200 bg-white
+            shadow-[0_12px_35px_rgba(28,25,23,0.045)];
+    }
+
+    .kanmo-form-section-header {
+        @apply flex items-start gap-4 border-b border-stone-100
+            bg-gradient-to-r from-kanmo-50/80 to-white px-5 py-5 sm:px-6;
+    }
+
+    .kanmo-form-section-body { @apply p-5 sm:p-6; }
+
+    .kanmo-section-icon {
+        @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl
+            bg-kanmo-100 text-kanmo-700 ring-1 ring-inset ring-kanmo-200;
+    }
+
+    .kanmo-step-button {
+        @apply flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left
+            transition hover:bg-stone-200 cursor-pointer;
+    }
+
+    .kanmo-step-number {
+        @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full
+            border border-stone-300 bg-white text-sm font-bold text-slate-500 transition;
+    }
+
+    .kanmo-step-button[data-state="active"] { @apply bg-kanmo-100; }
+    .kanmo-step-button[data-state="active"] .kanmo-step-number {
+        @apply border-kanmo-500 bg-kanmo-500 text-white shadow-[0_5px_14px_rgba(241,90,36,0.22)];
+    }
+    .kanmo-step-button[data-state="complete"] .kanmo-step-number {
+        @apply border-emerald-500 bg-emerald-500 text-white;
+    }
+    .kanmo-step-button[data-state="active"] .kanmo-step-title { @apply text-kanmo-800; }
+
+    .kanmo-progress-track { @apply overflow-hidden rounded-full bg-stone-200; }
+    .kanmo-progress-bar {
+        @apply h-full rounded-full bg-gradient-to-r from-kanmo-500 to-amber-400
+            transition-[width] duration-500 ease-out;
+    }
+}
+
+.js [data-form-step]:not([data-active="true"]) { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
