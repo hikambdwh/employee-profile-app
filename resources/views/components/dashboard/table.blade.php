@@ -5,10 +5,6 @@
             <div>
                 <div class="flex flex-wrap items-center gap-3">
                     <h2 class="text-lg font-bold text-slate-900">Employee Profile Completion</h2>
-                    <span
-                        class="inline-flex items-center rounded-full bg-kanmo-50 px-2.5 py-1 text-xs font-semibold text-kanmo-700 ring-1 ring-inset ring-kanmo-100">
-                        {{ number_format($employees->total(), 0, ',', '.') }} employee
-                    </span>
                 </div>
                 <p class="mt-1.5 text-sm text-slate-500">Pantau kelengkapan data employee, OD, dan keseluruhan profil.
                 </p>
