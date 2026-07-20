@@ -45,7 +45,7 @@
 
             <button
                 type="button"
-                class="text-xs font-semibold text-kanmo-600 hover:text-kanmo-700"
+                class="text-xs font-semibold cursor-pointer text-kanmo-600 hover:text-kanmo-700"
                 data-company-filter-clear
             >
                 Reset

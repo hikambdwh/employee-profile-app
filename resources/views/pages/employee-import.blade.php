@@ -3,7 +3,7 @@
         <header class="border-b border-stone-200 bg-white">
             <div class="mx-auto flex max-w-4xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-kanmo-500 font-extrabold text-white">K</div>
+                    <img width="40" src="{{ asset('img/kanmo-logo.jpeg') }}" alt="">
                     <div>
                         <h1 class="text-xl font-extrabold text-slate-900">Upload Employee Excel</h1>
                         <p class="mt-0.5 text-sm text-slate-500">Insert dan update berdasarkan Employee ID.</p>
@@ -44,7 +44,7 @@
                     <p class="text-xs font-bold uppercase tracking-wider text-kanmo-600">Employee data import</p>
                     <h2 class="mt-1 text-lg font-bold text-slate-900">Pilih file Excel</h2>
                     <p class="mt-1 text-sm leading-6 text-slate-500">
-                        Sistem membaca sheet Employee Details, Employee ID, dan kolom Mandatory pada baris 3.
+                        Sistem membaca sheet Employee Details, Employee ID, dan kolom Mandatory.
                     </p>
                 </div>
 
@@ -69,7 +69,6 @@
                         <ul class="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-6 text-amber-800">
                             <li>Employee ID yang sudah ada akan diperbarui.</li>
                             <li>Employee ID baru akan ditambahkan.</li>
-                            <li>Kolom tanpa tulisan Mandatory tidak akan diubah.</li>
                             <li>Nilai kosong tidak menghapus data lama.</li>
                             <li>Jika ada konflik, seluruh proses dibatalkan.</li>
                         </ul>

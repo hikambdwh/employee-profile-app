@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('access_id', 20)->nullable()->unique();
             $table->string('time_policy_code', 50);
             $table->string('shift_group_code', 50);
-            $table->string('business_unit_org_element_1', 255)->nullable();
-            $table->string('department_org_element_2', 255)->nullable();
+            $table->string('business_unit_org_element_1', 100)->nullable();
+            $table->string('department_org_element_2', 100)->nullable();
             $table->string('emergency_full_name', 255)->nullable();
             $table->text('current_address');
             $table->string('mother_full_name', 255)->nullable();
@@ -74,6 +74,8 @@ return new class extends Migration
             $table->string('ijazah_filename', 255)->nullable();
             $table->string('npwp_filename', 255)->nullable();
             $table->timestamps();
+            $table->foreign('business_unit_org_element_1')->references('business_unit_code')->on('business_units')->onDelete('cascade');
+            $table->foreign('department_org_element_2')->references('department_code')->on('departments')->onDelete('cascade');
         });
     }
 
