@@ -35,11 +35,11 @@ function initEmployeeForm() {
         );
     };
 
-const getRequiredFilePondFields = (scope = form) => {
-    return getFilePondFields(scope).filter(
-        (field) => field.dataset.filepondRequired === "true"
-    );
-};
+    const getRequiredFilePondFields = (scope = form) => {
+        return getFilePondFields(scope).filter(
+            (field) => field.dataset.filepondRequired === "true"
+        );
+    };
 
     let currentStep = 0;
     let isSubmitting = false;

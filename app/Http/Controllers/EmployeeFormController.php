@@ -381,10 +381,7 @@ class EmployeeFormController extends Controller
             /*
      * Hapus file lama jika ada dan berbeda.
      */
-            if (
-                !empty($employee->{$field}) &&
-                Storage::disk('public')->exists($employee->{$field})
-            ) {
+            if (!empty($employee->{$field}) && Storage::disk('public')->exists($employee->{$field})) {
                 Storage::disk('public')->delete($employee->{$field});
             }
 
