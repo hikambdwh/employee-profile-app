@@ -14,9 +14,12 @@
 
     <script>document.documentElement.classList.add('js');</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
 </head>
 <body>
     <div aria-hidden="true" class="h-1 bg-gradient-to-r from-kanmo-700 via-kanmo-500 to-amber-400"></div>
     {{ $slot }}
+
+    @stack('scripts')
 </body>
 </html>

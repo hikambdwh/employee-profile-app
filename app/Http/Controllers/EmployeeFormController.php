@@ -6,6 +6,8 @@ use App\Models\employee_details;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
+
 
 class EmployeeFormController extends Controller
 {
@@ -15,6 +17,8 @@ class EmployeeFormController extends Controller
     public function show(Request $request)
     {
         $user = null;
+
+        
 
         if ($request->filled('employee_id')) {
             $request->validate([
@@ -37,9 +41,25 @@ class EmployeeFormController extends Controller
             }
         }
 
+        $existingDocuments = [
+            'ijazah_filename' => filled($user?->ijazah_filename)
+                && Storage::disk('public')->exists($user->ijazah_filename),
+
+            'ktp_filename' => filled($user?->ktp_filename)
+                && Storage::disk('public')->exists($user->ktp_filename),
+
+            'kk_filename' => filled($user?->kk_filename)
+                && Storage::disk('public')->exists($user->kk_filename),
+
+            'npwp_filename' => filled($user?->npwp_filename)
+                && Storage::disk('public')->exists($user->npwp_filename),
+        ];
+
+
         return view('pages.form', [
             'title' => 'Employee Form',
             'user' => $user,
+            'existingDocuments' => $existingDocuments,
 
             /*
              * Dikirim ke Blade agar atribut required pada form
@@ -67,18 +87,12 @@ class EmployeeFormController extends Controller
             config('employee.empty_values', [])
         );
 
-        /*
-         * Menolak nilai placeholder seperti:
-         * -, --, N/A, n/a, dan variasi huruf lainnya.
-         */
         $notPlaceholder = function (
             string $attribute,
             mixed $value,
             \Closure $fail
         ) use ($emptyValues) {
-            $normalizedValue = strtoupper(
-                trim((string) $value)
-            );
+            $normalizedValue = strtoupper(trim((string) $value));
 
             if (in_array($normalizedValue, $emptyValues, true)) {
                 $fail("Field {$attribute} harus diisi dengan data yang valid.");
@@ -86,14 +100,40 @@ class EmployeeFormController extends Controller
         };
 
         /*
-         * Aturan tipe data setiap field.
-         * Status required akan ditambahkan otomatis berdasarkan config.
-         */
+     * Validasi employee_id dulu agar kita bisa ambil data employee.
+     */
+        $request->validate([
+            'employee_id' => [
+                'required',
+                'string',
+                'max:20',
+                'exists:employee_details,employee_id',
+            ],
+        ], [
+            'employee_id.exists' => 'Employee ID tidak ditemukan.',
+        ]);
+
+        $employee = employee_details::where(
+            'employee_id',
+            $request->employee_id
+        )->firstOrFail();
+
+        /*
+     * ktp_postal_code tidak ada input di form.
+     * Nilainya disamakan otomatis dengan current_postal_code.
+     */
+        $request->merge([
+            'ktp_postal_code' => $request->input('current_postal_code'),
+        ]);
+
+        $fileFields = [
+            'ktp_filename',
+            'kk_filename',
+            'ijazah_filename',
+            'npwp_filename',
+        ];
+
         $rules = [
-            /*
-             * Employee ID adalah data HR.
-             * Employee hanya menggunakannya untuk mencari record.
-             */
             'employee_id' => [
                 'required',
                 'string',
@@ -101,33 +141,25 @@ class EmployeeFormController extends Controller
                 'exists:employee_details,employee_id',
             ],
 
-            'emergency_full_name' => [
-                'string',
-                'max:100',
-            ],
-
-            'current_address' => [
-                'string',
-                'max:2000',
-            ],
-
-            'mother_full_name' => [
-                'string',
-                'max:100',
-            ],
+            'emergency_full_name' => ['string', 'max:255'],
+            'current_address' => ['string', 'max:2000'],
+            'mother_full_name' => ['string', 'max:255'],
 
             'education_level' => [
-                Rule::in([
-                    'SMA',
-                    'SMK',
-                    'D1',
-                    'D2',
-                    'D3',
-                    'D4',
-                    'S1',
-                    'S2',
-                    'S3',
-                ]),
+                Rule::in(['SMA', 'SMK', 'D1', 'D2', 'D3', 'D4', 'S1', 'S2', 'S3']),
+            ],
+
+            'education_from' => [
+                'integer',
+                'min:1800',
+                'max:2100',
+            ],
+
+            'education_end' => [
+                'integer',
+                'min:1800',
+                'max:2100',
+                'gte:education_from',
             ],
 
             'primary_contact_number' => [
@@ -136,10 +168,7 @@ class EmployeeFormController extends Controller
                 'regex:/^[0-9+\-\s()]+$/',
             ],
 
-            'tax_number' => [
-                'string',
-                'max:30',
-            ],
+            'tax_number' => ['string', 'max:30'],
 
             'emergency_contact_no' => [
                 'string',
@@ -147,35 +176,28 @@ class EmployeeFormController extends Controller
                 'regex:/^[0-9+\-\s()]+$/',
             ],
 
-            'current_provinsi' => [
-                'string',
-                'max:100',
-            ],
+            'current_provinsi' => ['string', 'max:255'],
+            'current_kotamadya_kabupaten' => ['string', 'max:255'],
+            'current_kecamatan' => ['string', 'max:255'],
+            'current_kelurahan' => ['string', 'max:255'],
+            'current_postal_code' => ['string', 'max:50'],
 
-            'primary_email' => [
-                'email',
-                'max:191',
-            ],
+            'ktp_address' => ['string', 'max:2000'],
+            'ktp_provinsi' => ['string', 'max:255'],
+            'ktp_kotamadya_kabupaten' => ['string', 'max:255'],
+            'ktp_kecamatan' => ['string', 'max:255'],
+            'ktp_kelurahan' => ['string', 'max:255'],
 
-            'display_name' => [
-                'string',
-                'max:100',
-            ],
+            /*
+         * Tidak ada input di Blade.
+         * Diisi otomatis dari current_postal_code.
+         */
+            'ktp_postal_code' => ['string', 'max:50'],
 
-            'current_kotamadya_kabupaten' => [
-                'string',
-                'max:100',
-            ],
-
-            'major' => [
-                'string',
-                'max:100',
-            ],
-
-            'institution_name' => [
-                'string',
-                'max:150',
-            ],
+            'primary_email' => ['email', 'max:191'],
+            'display_name' => ['string', 'max:255'],
+            'major' => ['string', 'max:255'],
+            'institution_name' => ['string', 'max:150'],
 
             'religion' => [
                 Rule::in([
@@ -185,14 +207,11 @@ class EmployeeFormController extends Controller
                     'Buddhism',
                     'Catholicism',
                     'Sikhism',
-                    'Other'
+                    'Other',
                 ]),
             ],
 
-            'birth_place' => [
-                'string',
-                'max:100',
-            ],
+            'birth_place' => ['string', 'max:255'],
 
             'date_of_birth' => [
                 'date',
@@ -200,37 +219,15 @@ class EmployeeFormController extends Controller
             ],
 
             'marital_status' => [
-                Rule::in([
-                    'Single',
-                    'Married',
-                    'Divorced',
-                    'Widowed',
-                ]),
+                Rule::in(['Single', 'Married', 'Divorced', 'Widowed']),
             ],
 
             'gender' => [
-                Rule::in([
-                    'Male',
-                    'Female',
-                ]),
-            ],
-
-            'ktp_address' => [
-                'string',
-                'max:2000',
+                Rule::in(['Male', 'Female']),
             ],
 
             'blood_group' => [
-                Rule::in([
-                    'A+',
-                    'B+',
-                    'AB+',
-                    'O+',
-                    'A-',
-                    'AB-',
-                    'B-',
-                    'O-',
-                ]),
+                Rule::in(['A+', 'B+', 'AB+', 'O+', 'A-', 'AB-', 'B-', 'O-']),
             ],
 
             'ktp_number' => [
@@ -239,16 +236,37 @@ class EmployeeFormController extends Controller
                 'regex:/^[0-9]+$/',
             ],
 
-            'nationality' => [
-                'string',
-                'max:50',
+            'nationality' => ['string', 'max:50'],
+
+            'ktp_filename' => [
+                Rule::requiredIf(fn() => empty($employee->ktp_filename)),
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
+                'max:5120',
+            ],
+
+            'kk_filename' => [
+                Rule::requiredIf(fn() => empty($employee->kk_filename)),
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
+                'max:5120',
+            ],
+
+            'ijazah_filename' => [
+                Rule::requiredIf(fn() => empty($employee->ijazah_filename)),
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
+                'max:5120',
+            ],
+
+            'npwp_filename' => [
+                Rule::requiredIf(fn() => empty($employee->npwp_filename)),
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
+                'max:5120',
             ],
         ];
 
-        /*
-         * Pastikan setiap field yang berada di config
-         * memiliki aturan validation.
-         */
         $unknownFields = array_diff(
             $employeeRequiredFields,
             array_keys($rules)
@@ -261,24 +279,18 @@ class EmployeeFormController extends Controller
             );
         }
 
-        /*
-         * Tambahkan required dan validasi placeholder
-         * secara otomatis.
-         */
         foreach ($employeeRequiredFields as $field) {
-            array_unshift(
-                $rules[$field],
-                'required'
-            );
+            if (in_array($field, $fileFields, true)) {
+                continue;
+            }
 
+            array_unshift($rules[$field], 'required');
             $rules[$field][] = $notPlaceholder;
         }
 
         $validated = $request->validate(
             $rules,
             [
-                'employee_id.exists' => 'Employee ID tidak ditemukan.',
-
                 'date_of_birth.before_or_equal' =>
                 'Tanggal lahir tidak boleh melebihi hari ini.',
 
@@ -290,29 +302,109 @@ class EmployeeFormController extends Controller
 
                 'ktp_number.regex' =>
                 'Nomor KTP hanya boleh berisi angka.',
+
+                'education_end.gte' =>
+                'Tahun selesai pendidikan tidak boleh lebih kecil dari tahun mulai pendidikan.',
+
+                'ktp_filename.required' =>
+                'File KTP wajib diupload.',
+
+                'kk_filename.required' =>
+                'File KK wajib diupload.',
+
+                'ijazah_filename.required' =>
+                'File ijazah wajib diupload.',
+
+                'npwp_filename.required' =>
+                'File NPWP wajib diupload.',
+
+                '*.mimes' =>
+                'File harus berupa PDF, JPG, JPEG, atau PNG.',
+
+                '*.max' =>
+                'Ukuran file maksimal 5MB.',
             ]
         );
 
-        $employee = employee_details::where(
-            'employee_id',
-            $validated['employee_id']
-        )->firstOrFail();
-
         /*
-         * Hanya mengambil field yang menjadi tanggung jawab employee.
-         * Kolom HR tidak akan ikut diperbarui walaupun dimanipulasi
-         * melalui request.
-         */
+     * Ambil data text/input biasa saja.
+     * File tidak boleh langsung masuk fill(), karena isinya UploadedFile object.
+     */
         $employeeData = Arr::only(
             $validated,
-            $employeeRequiredFields
+            array_diff($employeeRequiredFields, $fileFields)
         );
 
         $employee->fill($employeeData);
 
         /*
-         * Penanda bahwa employee pernah menyelesaikan submit.
-         */
+     * Simpan file jika employee upload file baru.
+     */
+        $fileFieldMap = [
+            'ktp_filename' => [
+                'prefix' => 'ktp',
+                'folder' => 'ktp',
+            ],
+            'kk_filename' => [
+                'prefix' => 'kk',
+                'folder' => 'kk',
+            ],
+            'ijazah_filename' => [
+                'prefix' => 'ijazah',
+                'folder' => 'ijazah',
+            ],
+            'npwp_filename' => [
+                'prefix' => 'npwp',
+                'folder' => 'npwp',
+            ],
+        ];
+
+        $safeEmployeeId = preg_replace(
+            '/[^A-Za-z0-9_-]/',
+            '_',
+            $employee->employee_id
+        );
+
+        foreach ($fileFieldMap as $field => $config) {
+            if (!$request->hasFile($field)) {
+                continue;
+            }
+
+            $file = $request->file($field);
+
+            $extension = strtolower($file->getClientOriginalExtension());
+
+            $fileName = $config['prefix'] . '_' . $safeEmployeeId . '.' . $extension;
+
+            $directory = 'employee-documents/' . $config['folder'];
+
+            /*
+     * Hapus file lama jika ada dan berbeda.
+     */
+            if (
+                !empty($employee->{$field}) &&
+                Storage::disk('public')->exists($employee->{$field})
+            ) {
+                Storage::disk('public')->delete($employee->{$field});
+            }
+
+            /*
+     * Simpan file dengan nama custom.
+     * Contoh hasil:
+     * employee-documents/ktp/ktp_6949.pdf
+     */
+            $path = $file->storeAs(
+                $directory,
+                $fileName,
+                'public'
+            );
+ 
+            /*
+     * Yang disimpan ke database adalah path file.
+     */
+            $employee->{$field} = $path;
+        }
+
         if (is_null($employee->employee_completed_at)) {
             $employee->employee_completed_at = now();
         }
@@ -320,9 +412,6 @@ class EmployeeFormController extends Controller
         $employee->save();
         $employee->refresh();
 
-        /*
-         * Pemeriksaan tambahan setelah data tersimpan.
-         */
         $recognizedAsComplete = employee_details::query()
             ->whereKey($employee->id)
             ->employeeDataComplete()
@@ -339,9 +428,6 @@ class EmployeeFormController extends Controller
                 );
         }
 
-        /*
-         * Arahkan ke form supaya statistik langsung dihitung ulang.
-         */
         return redirect('form')
             ->with(
                 'success',

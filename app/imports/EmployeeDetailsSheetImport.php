@@ -69,7 +69,19 @@ class EmployeeDetailsSheetImport implements
         'blood_group' => 'blood_group',
         'ktp_number' => 'ktp_number',
         'nationality' => 'nationality',
-        
+        'business_unitorg_element_1' => 'business_unit_org_element_1',
+        'departmentorg_element_2' => 'department_org_element_2',
+        'current_postal_code' => 'current_postal_code',
+        'current_kecamatan' => 'current_kecamatan',
+        'current_kelurahan' => 'current_kelurahan',
+        'date_of_join_yyyy_mm_dd' => 'date_of_join',
+        'education_from' => 'education_from',
+        'education_end' => 'education_end',
+        'ktp_kecamatan' => 'ktp_kecamatan',
+        'ktp_kelurahan' => 'ktp_kelurahan',
+        'ktp_kotamadya_kabupaten' => 'ktp_kotamadya_kabupaten',
+        'ktp_postal_code' => 'ktp_postal_code',
+        'ktp_provinsi' => 'ktp_provinsi',
     ];
 
     private int $inserted = 0;

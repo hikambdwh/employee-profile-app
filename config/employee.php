@@ -30,6 +30,9 @@ return [
     'bpa1_sifat_pemotongan_code',
     'shift_group_code',
     'time_policy_code',
+    'date_of_join',
+    'department_org_element_2',
+    'business_unit_org_element_1'
   ],
 
   /*
@@ -65,6 +68,20 @@ return [
     'blood_group',
     'ktp_number',
     'nationality',
+    'current_postal_code',
+    'current_kecamatan',
+    'current_kelurahan',
+    'education_from',
+    'education_end',
+    'ktp_provinsi',
+    'ktp_kotamadya_kabupaten',
+    'ktp_kecamatan',
+    'ktp_kelurahan',
+    'ktp_postal_code',
+    'ktp_filename',
+    'kk_filename',
+    'ijazah_filename',
+    'npwp_filename',
   ],
 
   /*

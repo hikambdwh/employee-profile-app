@@ -145,6 +145,19 @@
         @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full
             border border-stone-300 bg-white text-sm font-bold text-slate-500 transition;
     }
+    .kanmo-step-button[data-state="active-complete"] {
+        @apply bg-emerald-50;
+    }
+
+    .kanmo-step-button[data-state="active-complete"]
+    .kanmo-step-number {
+        @apply border-emerald-500 bg-emerald-500 text-white;
+    }
+
+    .kanmo-step-button[data-state="active-complete"]
+    .kanmo-step-title {
+        @apply text-emerald-800;
+    }
 
     .kanmo-step-button[data-state="active"] { @apply bg-kanmo-100; }
     .kanmo-step-button[data-state="active"] .kanmo-step-number {
